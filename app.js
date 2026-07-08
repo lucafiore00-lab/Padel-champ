@@ -891,6 +891,7 @@ class PadelLeagueApp {
   }
 
   renderAdminState() {
+    // Pulsante nella sidebar
     const btn = document.getElementById('admin-lock-btn');
     if (btn) {
       if (this.isAdmin) {
@@ -901,6 +902,18 @@ class PadelLeagueApp {
         btn.innerHTML = `<i data-lucide="lock" style="width: 12px; height: 12px;"></i> <span>Area Admin</span>`;
         btn.style.borderColor = '';
         btn.style.background = '';
+      }
+    }
+
+    // Pulsante nell'header principale
+    const headerBtn = document.getElementById('header-admin-btn');
+    if (headerBtn) {
+      if (this.isAdmin) {
+        headerBtn.innerHTML = `<i data-lucide="lock-open" style="width: 20px; height: 20px; color: #10b981;"></i>`;
+        headerBtn.title = "Esci da Amministratore";
+      } else {
+        headerBtn.innerHTML = `<i data-lucide="lock" style="width: 20px; height: 20px; color: var(--text-muted);"></i>`;
+        headerBtn.title = "Accedi come Amministratore";
       }
     }
   }
