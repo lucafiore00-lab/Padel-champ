@@ -9,6 +9,7 @@ class PadelLeagueApp {
     this.activeTab = 'dashboard';
     this.activeRound = 1;
     this.selectedMatchId = null;
+    this.defaultCloudUrl = 'https://script.google.com/macros/s/AKfycbzjZmY2eRgrYznelKPcI_lR8AZrJm_TrMY6Hf0KT5T_J5EOM3vudrJOj15uOqMJaFxu/exec'; // Incolla qui il tuo URL di Google Apps Script per renderlo predefinito per tutti!
     
     // Bindings
     this.handleTabClick = this.handleTabClick.bind(this);
@@ -31,7 +32,7 @@ class PadelLeagueApp {
   }
 
   loadDatabase() {
-    const cloudUrl = localStorage.getItem('padel_cloud_url');
+    const cloudUrl = localStorage.getItem('padel_cloud_url') || this.defaultCloudUrl;
     if (cloudUrl) {
       // Fetch from Google Sheets Apps Script Web App
       fetch(cloudUrl)
@@ -818,7 +819,7 @@ class PadelLeagueApp {
   }
 
   syncToCloud() {
-    const cloudUrl = localStorage.getItem('padel_cloud_url');
+    const cloudUrl = localStorage.getItem('padel_cloud_url') || this.defaultCloudUrl;
     if (!cloudUrl) return;
 
     fetch(cloudUrl, {
