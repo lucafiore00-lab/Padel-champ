@@ -9,7 +9,9 @@ class PadelLeagueApp {
     this.activeTab = 'dashboard';
     this.activeRound = 1;
     this.selectedMatchId = null;
-    this.defaultCloudUrl = 'https://script.google.com/macros/s/AKfycbzjZmY2eRgrYznelKPcI_lR8AZrJm_TrMY6Hf0KT5T_J5EOM3vudrJOj15uOqMJaFxu/exec'; // Incolla qui il tuo URL di Google Apps Script per renderlo predefinito per tutti!
+    this.defaultCloudUrl = ''; // Incolla qui il tuo URL di Google Apps Script per renderlo predefinito per tutti!
+    this.isAdmin = localStorage.getItem('padel_is_admin') === 'true';
+    this.adminPin = '2026';
     
     // Bindings
     this.handleTabClick = this.handleTabClick.bind(this);
@@ -24,10 +26,13 @@ class PadelLeagueApp {
       btn.addEventListener('click', this.handleTabClick);
     });
 
-    // 3. Render Lucide icons
+    // 3. Update admin UI status
+    this.renderAdminState();
+
+    // 4. Render Lucide icons
     this.renderIcons();
 
-    // 4. Render initial tab
+    // 5. Render initial tab
     this.showTab('dashboard');
   }
 
@@ -271,6 +276,7 @@ class PadelLeagueApp {
         break;
       case 'backup':
         this.renderCloudUrl();
+        this.renderBackupControls();
         break;
     }
     this.renderIcons();
@@ -369,6 +375,12 @@ class PadelLeagueApp {
         setsDetailsHtml = `(${setDetails.join(', ')})`;
       }
 
+      const editButtonHtml = this.isAdmin 
+        ? `<button class="btn btn-secondary btn-sm" onclick="app.openScoreModal('${m.id}')" style="margin-top: 10px;">
+             <i data-lucide="edit-3"></i> Risultato
+           </button>`
+        : '';
+
       card.innerHTML = `
         <div class="pair-names">${p1Names}</div>
         <div class="match-vs">VS</div>
@@ -376,9 +388,7 @@ class PadelLeagueApp {
         <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
           <div class="match-score-display">${scoreHtml}</div>
           <div class="match-score-sets">${setsDetailsHtml}</div>
-          <button class="btn btn-secondary btn-sm" onclick="app.openScoreModal('${m.id}')" style="margin-top: 10px;">
-            <i data-lucide="edit-3"></i> Risultato
-          </button>
+          ${editButtonHtml}
         </div>
       `;
       container.appendChild(card);
@@ -444,13 +454,19 @@ class PadelLeagueApp {
       group.className = 'form-group';
       group.innerHTML = `
         <label class="small-text text-muted" style="text-transform: uppercase;">Amico ${idx + 1}</label>
-        <input type="text" id="player-input-${p.id}" class="form-control" value="${p.name}" required>
+        <input type="text" id="player-input-${p.id}" class="form-control" value="${p.name}" required ${this.isAdmin ? '' : 'disabled'}>
       `;
       form.appendChild(group);
     });
+
+    const saveNamesBtn = document.querySelector('button[onclick="app.savePlayersNames()"]');
+    if (saveNamesBtn) {
+      saveNamesBtn.style.display = this.isAdmin ? 'inline-flex' : 'none';
+    }
   }
 
   savePlayersNames() {
+    if (!this.isAdmin) return;
     const inputs = document.querySelectorAll('[id^="player-input-"]');
     const newNamesMap = {};
     let hasEmpty = false;
@@ -490,12 +506,26 @@ class PadelLeagueApp {
 
   // PRIZES GESTION
   renderPrizes() {
-    document.getElementById('config-prize-1st').value = this.db.prizes.first || '';
-    document.getElementById('config-prize-2nd').value = this.db.prizes.second || '';
-    document.getElementById('config-prize-3rd').value = this.db.prizes.third || '';
+    const p1 = document.getElementById('config-prize-1st');
+    const p2 = document.getElementById('config-prize-2nd');
+    const p3 = document.getElementById('config-prize-3rd');
+    if (p1 && p2 && p3) {
+      p1.value = this.db.prizes.first || '';
+      p2.value = this.db.prizes.second || '';
+      p3.value = this.db.prizes.third || '';
+      p1.disabled = !this.isAdmin;
+      p2.disabled = !this.isAdmin;
+      p3.disabled = !this.isAdmin;
+    }
+
+    const savePrizesBtn = document.querySelector('button[onclick="app.savePrizes()"]');
+    if (savePrizesBtn) {
+      savePrizesBtn.style.display = this.isAdmin ? 'inline-flex' : 'none';
+    }
   }
 
   savePrizes() {
+    if (!this.isAdmin) return;
     this.db.prizes.first = document.getElementById('config-prize-1st').value.trim();
     this.db.prizes.second = document.getElementById('config-prize-2nd').value.trim();
     this.db.prizes.third = document.getElementById('config-prize-3rd').value.trim();
@@ -836,6 +866,63 @@ class PadelLeagueApp {
     .catch(err => {
       console.error("Errore sinc. cloud:", err);
     });
+  }
+
+  toggleAdminMode() {
+    if (this.isAdmin) {
+      this.isAdmin = false;
+      localStorage.removeItem('padel_is_admin');
+      this.showToast("Sessione Amministratore chiusa.");
+    } else {
+      const pin = prompt("Inserisci il PIN Amministratore per abilitare le modifiche:");
+      if (pin === this.adminPin) {
+        this.isAdmin = true;
+        localStorage.setItem('padel_is_admin', 'true');
+        this.showToast("Accesso Amministratore sbloccato!");
+      } else {
+        if (pin !== null) {
+          this.showToast("PIN errato. Modifiche bloccate.", "error");
+        }
+        return;
+      }
+    }
+    this.renderAdminState();
+    this.renderActiveTab();
+  }
+
+  renderAdminState() {
+    const btn = document.getElementById('admin-lock-btn');
+    if (btn) {
+      if (this.isAdmin) {
+        btn.innerHTML = `<i data-lucide="lock-open" style="width: 12px; height: 12px; color: #10b981;"></i> <span style="color: #10b981; font-weight: 700;">Admin Attivo (Esci)</span>`;
+        btn.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+        btn.style.background = 'rgba(16, 185, 129, 0.05)';
+      } else {
+        btn.innerHTML = `<i data-lucide="lock" style="width: 12px; height: 12px;"></i> <span>Area Admin</span>`;
+        btn.style.borderColor = '';
+        btn.style.background = '';
+      }
+    }
+  }
+
+  renderBackupControls() {
+    const input = document.getElementById('config-cloud-url');
+    if (input) {
+      input.disabled = !this.isAdmin;
+    }
+    
+    const resetBtn = document.querySelector('button[onclick="app.resetToMock()"]');
+    const clearBtn = document.querySelector('button[onclick="app.clearDatabase()"]');
+    if (resetBtn && clearBtn) {
+      resetBtn.style.display = this.isAdmin ? 'inline-flex' : 'none';
+      clearBtn.style.display = this.isAdmin ? 'inline-flex' : 'none';
+    }
+    
+    const uploadZone = document.getElementById('csv-rpe-zone');
+    if (uploadZone) {
+      uploadZone.style.pointerEvents = this.isAdmin ? 'auto' : 'none';
+      uploadZone.style.opacity = this.isAdmin ? '1' : '0.5';
+    }
   }
 }
 
