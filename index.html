@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Padel League 2026</title>
+  <!-- Google Fonts Outfit -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-container">
+    
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar-nav">
+      <!-- Close button on mobile -->
+      <button class="btn-close" id="sidebar-close" onclick="app.closeSidebar()" style="position: absolute; top: 20px; right: 20px; display: none; font-size: 28px; z-index: 10;">&times;</button>
+      
+      <div class="logo-container">
+        <div class="logo-circle">
+          <i data-lucide="trophy"></i>
+        </div>
+        <div class="logo-text">
+          <h1>Padel League 2026</h1>
+          <span>Championship 2vs2</span>
+        </div>
+      </div>
+      
+      <nav class="nav-menu">
+        <button class="nav-item active" data-target="dashboard">
+          <i data-lucide="layout-dashboard"></i>
+          <span>Dashboard & Podio</span>
+        </button>
+        <button class="nav-item" data-target="calendar">
+          <i data-lucide="calendar"></i>
+          <span>Giornate & Risultati</span>
+        </button>
+        <button class="nav-item" data-target="standings">
+          <i data-lucide="award"></i>
+          <span>Classifica Generale</span>
+        </button>
+        <button class="nav-item" data-target="players">
+          <i data-lucide="users"></i>
+          <span>Gestione Amici</span>
+        </button>
+        <button class="nav-item" data-target="backup">
+          <i data-lucide="database"></i>
+          <span>Gestione Database</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="footer-status">
+          <span class="status-dot"></span>
+          <span>Database Locale Offline</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+      
+      <!-- HEADER -->
+      <header class="main-header">
+        <div style="display: flex; align-items: center; gap: 15px;">
+          <!-- Menu Toggle Button -->
+          <button id="sidebar-toggle" onclick="app.toggleSidebar()" style="background: transparent; border: none; cursor: pointer; color: var(--text-white); width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; padding: 0;">
+            <i data-lucide="menu" style="width: 24px; height: 24px;"></i>
+          </button>
+          <div>
+            <h2 id="page-title">Dashboard & Podio</h2>
+            <p class="text-muted" id="page-subtitle">Riepilogo del torneo, prossimi match e premiazioni</p>
+          </div>
+        </div>
+      </header>
+
+      <!-- VIEWPORTS CONTAINER -->
+      <div class="viewports-container">
+        
+        <!-- 1. DASHBOARD VIEWPORT -->
+        <section id="dashboard" class="viewport active">
+          <!-- Stats Grid -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon bg-yellow-soft">
+                <i data-lucide="calendar-check"></i>
+              </div>
+              <div>
+                <span class="stat-label">Giornate Giocate</span>
+                <h3 class="stat-value" id="stat-rounds-played">0 / 7</h3>
+              </div>
+            </div>
+            
+            <div class="stat-card">
+              <div class="stat-icon bg-yellow-soft">
+                <i data-lucide="activity"></i>
+              </div>
+              <div>
+                <span class="stat-label">Partite Concluse</span>
+                <h3 class="stat-value" id="stat-matches-played">0 / 14</h3>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon bg-yellow-soft">
+                <i data-lucide="flame"></i>
+              </div>
+              <div>
+                <span class="stat-label">Leader Attuale</span>
+                <h3 class="stat-value text-yellow" id="stat-leader">-</h3>
+              </div>
+            </div>
+          </div>
+
+          <!-- Podium Area -->
+          <div class="card" style="margin-top: 25px;">
+            <div class="card-header" style="border-bottom: 1px solid var(--border-color);">
+              <h3 style="color: var(--text-white); margin: 0; font-size: 18px;">🏆 Il Podio dei Premiati</h3>
+              <p class="text-muted" style="margin: 4px 0 0; font-size: 12px;">Classifica provvisoria e premi assegnati</p>
+            </div>
+            <div class="card-body" style="padding: 30px;">
+              <div class="podium-container">
+                <!-- 2nd place -->
+                <div class="podium-column second-place">
+                  <div class="podium-avatar">
+                    <i data-lucide="medal" style="color: #c0c0c0; width: 28px; height: 28px;"></i>
+                    <span id="podium-name-second">Nessuno</span>
+                  </div>
+                  <div class="podium-step step-2">
+                    <span class="number">2</span>
+                    <span class="step-label">Argento</span>
+                  </div>
+                  <div class="podium-prize-card">
+                    <strong>Premio:</strong>
+                    <span id="podium-prize-second">Caricamento...</span>
+                  </div>
+                </div>
+
+                <!-- 1st place -->
+                <div class="podium-column first-place">
+                  <div class="podium-avatar">
+                    <i data-lucide="crown" style="color: #ffd700; width: 36px; height: 36px; filter: drop-shadow(0 0 8px rgba(255,215,0,0.5));"></i>
+                    <span id="podium-name-first">Nessuno</span>
+                  </div>
+                  <div class="podium-step step-1">
+                    <span class="number">1</span>
+                    <span class="step-label">Campione</span>
+                  </div>
+                  <div class="podium-prize-card">
+                    <strong>Premio:</strong>
+                    <span id="podium-prize-first">Caricamento...</span>
+                  </div>
+                </div>
+
+                <!-- 3rd place -->
+                <div class="podium-column third-place">
+                  <div class="podium-avatar">
+                    <i data-lucide="medal" style="color: #cd7f32; width: 28px; height: 28px;"></i>
+                    <span id="podium-name-third">Nessuno</span>
+                  </div>
+                  <div class="podium-step step-3">
+                    <span class="number">3</span>
+                    <span class="step-label">Bronzo</span>
+                  </div>
+                  <div class="podium-prize-card">
+                    <strong>Premio:</strong>
+                    <span id="podium-prize-third">Caricamento...</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. CALENDAR VIEWPORT -->
+        <section id="calendar" class="viewport">
+          <div class="section-actions-bar" style="justify-content: flex-start; gap: 15px;">
+            <div style="display: flex; gap: 8px;" id="giornate-filter-btns">
+              <!-- Giornate tabs buttons R1 to R7 -->
+            </div>
+          </div>
+
+          <div class="card" style="margin-top: 15px;">
+            <div class="card-header" style="border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <h3 id="current-round-title" style="color: var(--text-white); margin: 0;">Giornata 1</h3>
+                <p class="text-muted" style="margin: 4px 0 0; font-size: 12px;">Accoppiamenti casuali generati per questa giornata</p>
+              </div>
+              <span class="badge" id="round-status-badge">In corso</span>
+            </div>
+            <div class="card-body" id="round-matches-container" style="padding: 24px; display: flex; flex-direction: column; gap: 20px;">
+              <!-- Dynamic matches items for active round -->
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. STANDINGS VIEWPORT -->
+        <section id="standings" class="viewport">
+          <div class="card">
+            <div class="card-header" style="border-bottom: 1px solid var(--border-color);">
+              <h3 style="color: var(--text-white); margin: 0;">Graduatoria Individuale</h3>
+              <p class="text-muted" style="margin: 4px 0 0; font-size: 12px;">Ordinata per Punti, Set Vinti e Game Vinti</p>
+            </div>
+            <div class="card-table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th style="width: 50px; text-align: center;">Pos.</th>
+                    <th>Giocatore</th>
+                    <th style="text-align: center; color: var(--primary); font-weight: 700;">Punti</th>
+                    <th style="text-align: center;">Partite</th>
+                    <th style="text-align: center;">Vinte (2-0)</th>
+                    <th style="text-align: center;">Vinte (2-1)</th>
+                    <th style="text-align: center;">Perse</th>
+                    <th style="text-align: center; color: var(--primary);">Set Vinti</th>
+                    <th style="text-align: center;">Game Vinti</th>
+                  </tr>
+                </thead>
+                <tbody id="standings-table-body">
+                  <!-- Dynamic standings rows -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Point rules notice -->
+          <div class="alert alert-info" style="margin-top: 20px; font-size: 13px; background: rgba(212, 252, 52, 0.05); border: 1px solid rgba(212, 252, 52, 0.15);">
+            <strong>ℹ️ Calcolo Punteggi</strong>: 
+            Vittoria per 2-0 = <strong>3 Punti</strong> | 
+            Vittoria per 2-1 = <strong>2 Punti</strong> | 
+            Sconfitta = <strong>0 Punti</strong>. 
+            <br>
+            In caso di parità di Punti, l'ordine è determinato da: <strong>1) Set Vinti complessivi</strong>, <strong>2) Game vinti complessivi</strong>.
+          </div>
+        </section>
+
+        <!-- 4. PLAYERS VIEWPORT -->
+        <section id="players" class="viewport">
+          <div class="stats-grid" style="grid-template-columns: 2fr 1fr; gap: 20px;">
+            <!-- Players List Card -->
+            <div class="card">
+              <div class="card-header" style="border-bottom: 1px solid var(--border-color);">
+                <h3 style="color: var(--text-white); margin: 0;">Calciatori / Giocatori Iscritti</h3>
+                <p class="text-muted" style="margin: 4px 0 0; font-size: 12px;">Modifica i nomi degli 8 amici partecipanti</p>
+              </div>
+              <div class="card-body" style="padding: 20px;">
+                <form id="players-names-form" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                  <!-- Dynamic 8 player inputs -->
+                </form>
+                <div style="margin-top: 25px; display: flex; justify-content: flex-end;">
+                  <button type="button" class="btn btn-primary" onclick="app.savePlayersNames()">
+                    <i data-lucide="check"></i> Salva Nomi & Rigenera Calendario
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Prizes Configuration Card -->
+            <div class="card">
+              <div class="card-header" style="border-bottom: 1px solid var(--border-color);">
+                <h3 style="color: var(--text-white); margin: 0;">🎁 Configura Premi</h3>
+                <p class="text-muted" style="margin: 4px 0 0; font-size: 12px;">Definisci i premi del podio</p>
+              </div>
+              <div class="card-body" style="padding: 20px; display: flex; flex-direction: column; gap: 15px;">
+                <div class="form-group">
+                  <label class="small-text text-muted" style="text-transform: uppercase;">Premio 1° Posto</label>
+                  <input type="text" id="config-prize-1st" class="form-control" placeholder="es. Pala Adidas">
+                </div>
+                <div class="form-group">
+                  <label class="small-text text-muted" style="text-transform: uppercase;">Premio 2° Posto</label>
+                  <input type="text" id="config-prize-2nd" class="form-control" placeholder="es. Zaino Head">
+                </div>
+                <div class="form-group">
+                  <label class="small-text text-muted" style="text-transform: uppercase;">Premio 3° Posto</label>
+                  <input type="text" id="config-prize-3rd" class="form-control" placeholder="es. Tubo Palline">
+                </div>
+                <button type="button" class="btn btn-secondary" onclick="app.savePrizes()" style="margin-top: 10px;">
+                  <i data-lucide="save"></i> Salva Premi
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 5. BACKUP VIEWPORT -->
+        <section id="backup" class="viewport">
+          <div class="stats-grid" style="grid-template-columns: repeat(2, 1fr); gap: 20px;">
+            <!-- Backup actions -->
+            <div class="card">
+              <div class="card-header" style="border-bottom: 1px solid var(--border-color);">
+                <h3 style="color: var(--text-white); margin: 0;">Salva & Esporta dati</h3>
+                <p class="text-muted" style="margin: 4px 0 0; font-size: 12px;">Scarica una copia del database in formato JSON</p>
+              </div>
+              <div class="card-body" style="padding: 24px; display: flex; flex-direction: column; gap: 15px; align-items: flex-start;">
+                <p class="small-text text-muted">Esportando i dati potrai salvarli in un file sul tuo computer e caricarli nuovamente in caso di cambio browser o formattazione.</p>
+                <button class="btn btn-primary" onclick="app.exportDatabase()">
+                  <i data-lucide="download"></i> Esporta Database (JSON)
+                </button>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header" style="border-bottom: 1px solid var(--border-color);">
+                <h3 style="color: var(--text-white); margin: 0;">Ripristina dati</h3>
+                <p class="text-muted" style="margin: 4px 0 0; font-size: 12px;">Seleziona un file JSON precedentemente esportato</p>
+              </div>
+              <div class="card-body" style="padding: 24px; display: flex; flex-direction: column; gap: 15px;">
+                <div class="upload-zone" id="csv-rpe-zone" style="height: 120px; border: 2px dashed var(--border-color); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; border-radius: 8px;" onclick="document.getElementById('import-db-input').click()">
+                  <i data-lucide="upload" style="width: 32px; height: 32px; color: var(--text-muted); margin-bottom: 8px;"></i>
+                  <p class="small-text text-muted" style="margin: 0; font-size: 12px;">Carica file JSON...</p>
+                  <input type="file" id="import-db-input" accept=".json" style="display: none;" onchange="app.importDatabase(event)">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cloud Sync Card -->
+          <div class="card" style="margin-top: 25px;">
+            <div class="card-header" style="border-bottom: 1px solid var(--border-color);">
+              <h3 style="color: var(--text-white); margin: 0;">☁️ Sincronizzazione Cloud Automatica</h3>
+              <p class="text-muted" style="margin: 4px 0 0; font-size: 12px;">Sincronizza i risultati in tempo reale con i tuoi amici senza dover usare GitHub ad ogni inserimento</p>
+            </div>
+            <div class="card-body" style="padding: 20px; display: flex; flex-direction: column; gap: 15px;">
+              <div class="form-group">
+                <label class="small-text text-muted" style="text-transform: uppercase;">URL della Web App di Google (Google Apps Script)</label>
+                <input type="url" id="config-cloud-url" class="form-control" placeholder="es. https://script.google.com/macros/s/.../exec" oninput="app.saveCloudUrl()">
+              </div>
+              <div class="alert alert-info" style="font-size: 12px; line-height: 1.5; background: rgba(204, 255, 0, 0.04); border: 1px solid rgba(204, 255, 0, 0.15);">
+                <strong>Come impostarlo in 2 minuti (Gratuito e Privato):</strong>
+                <ol style="margin-left: 20px; margin-top: 6px; display: flex; flex-direction: column; gap: 4px;">
+                  <li>Apri <strong>Google Drive</strong> e crea un nuovo foglio su <strong>Google Fogli</strong>.</li>
+                  <li>In alto clicca su <strong>Estensioni</strong> &rarr; <strong>Apps Script</strong>.</li>
+                  <li>Incolla il codice di sincronizzazione fornito (leggi sotto per copiarlo).</li>
+                  <li>Clicca in alto a destra su <strong>Distribuisci</strong> &rarr; <strong>Nuova distribuzione</strong>.</li>
+                  <li>Fai clic sulla rotella delle impostazioni e seleziona <strong>Applicazione Web</strong>.</li>
+                  <li>Configura: <em>Esegui come</em>: <strong>"Tu"</strong> | <em>Chi ha accesso</em>: <strong>"Chiunque"</strong>.</li>
+                  <li>Clicca su <strong>Distribuisci</strong>, autorizza i permessi del tuo account Google, e copia l'<strong>URL dell'applicazione web</strong> per incollarlo qui sopra.</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top: 25px; border-color: rgba(239, 68, 68, 0.3);">
+            <div class="card-header" style="border-bottom: 1px solid rgba(239, 68, 68, 0.2); background: rgba(239, 68, 68, 0.02);">
+              <h3 style="color: #ef4444; margin: 0;">Pannello di Manutenzione</h3>
+              <p class="text-muted" style="margin: 4px 0 0; font-size: 12px;">Operazioni distruttive di reset</p>
+            </div>
+            <div class="card-body" style="padding: 24px; display: flex; gap: 15px;">
+              <button class="btn btn-danger" onclick="app.resetToMock()">
+                <i data-lucide="refresh-cw"></i> Re-inizializza con Dati Mock
+              </button>
+              <button class="btn btn-danger" style="background: transparent; border: 1px solid #ef4444; color: #ef4444;" onclick="app.clearDatabase()">
+                <i data-lucide="trash-2"></i> Cancella Database Completo
+              </button>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- MATCH RESULT MODAL -->
+  <div class="modal" id="score-modal">
+    <div class="modal-content" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3 id="modal-match-title">Inserisci Risultato Partita</h3>
+        <button class="btn-close" onclick="app.closeScoreModal()">&times;</button>
+      </div>
+      <form id="score-form" onsubmit="app.handleScoreSubmit(event)">
+        <input type="hidden" id="modal-match-id">
+        <div class="modal-body" style="padding: 20px;">
+          <!-- Pairs Header Names -->
+          <div style="display: grid; grid-template-columns: 1fr 40px 1fr; gap: 15px; text-align: center; font-weight: 600; margin-bottom: 20px;">
+            <div id="modal-pair1-names" style="color: var(--primary);">Coppia A</div>
+            <div>VS</div>
+            <div id="modal-pair2-names" style="color: var(--primary);">Coppia B</div>
+          </div>
+
+          <!-- Sets Score Inputs -->
+          <div style="display: flex; flex-direction: column; gap: 15px;">
+            <!-- Set 1 -->
+            <div class="form-row" style="display: grid; grid-template-columns: 2fr 1fr 1fr 2fr; gap: 10px; align-items: center;">
+              <div style="text-align: right; font-size: 13px;">Set 1</div>
+              <input type="number" id="set1-val1" class="form-control text-center" min="0" max="7" required placeholder="0">
+              <input type="number" id="set1-val2" class="form-control text-center" min="0" max="7" required placeholder="0">
+              <div style="font-size: 13px;">Set 1</div>
+            </div>
+            <!-- Set 2 -->
+            <div class="form-row" style="display: grid; grid-template-columns: 2fr 1fr 1fr 2fr; gap: 10px; align-items: center;">
+              <div style="text-align: right; font-size: 13px;">Set 2</div>
+              <input type="number" id="set2-val1" class="form-control text-center" min="0" max="7" required placeholder="0">
+              <input type="number" id="set2-val2" class="form-control text-center" min="0" max="7" required placeholder="0">
+              <div style="font-size: 13px;">Set 2</div>
+            </div>
+            <!-- Set 3 -->
+            <div class="form-row" style="display: grid; grid-template-columns: 2fr 1fr 1fr 2fr; gap: 10px; align-items: center;">
+              <div style="text-align: right; font-size: 13px; color: var(--text-muted);">Set 3 (opz.)</div>
+              <input type="number" id="set3-val1" class="form-control text-center" min="0" max="7" placeholder="0">
+              <input type="number" id="set3-val2" class="form-control text-center" min="0" max="7" placeholder="0">
+              <div style="font-size: 13px; color: var(--text-muted);">Set 3 (opz.)</div>
+            </div>
+          </div>
+          
+          <div class="alert alert-info" style="margin-top: 15px; font-size: 11px; padding: 8px 12px;">
+            Inserisci i game vinti da ciascuna coppia (es. 6 - 4). Il set 3 va compilato solo in caso di pareggio 1-1 nei primi due set.
+          </div>
+        </div>
+        <div class="modal-footer" style="padding: 15px 20px;">
+          <button type="button" class="btn btn-secondary" onclick="app.closeScoreModal()">Annulla</button>
+          <button type="submit" class="btn btn-primary">Salva Punteggio</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Sidebar Overlay for mobile drawer -->
+  <div id="sidebar-overlay" onclick="app.closeSidebar()" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); z-index: 1999;"></div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="mock-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
